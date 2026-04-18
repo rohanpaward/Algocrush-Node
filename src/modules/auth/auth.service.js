@@ -129,11 +129,11 @@ const googleCallbackHandler = async (req, h) => {
 
     return h
       // .redirect("http://localhost:5173/oauth-success")
-      .redirect("https://algocrush-frontend.vercel.app/oauth-success")
+      .redirect("https://algocrush-frontend.onrender.com/oauth-success")
       .state("token", token, {
         isHttpOnly: true,
         isSecure: true,
-        isSameSite: "Lax",
+        isSameSite: "None",
         path: "/",
       });
 

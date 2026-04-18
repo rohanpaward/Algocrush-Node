@@ -128,7 +128,8 @@ const googleCallbackHandler = async (req, h) => {
     );
 
     return h
-      .redirect("http://localhost:5173/oauth-success")
+      // .redirect("http://localhost:5173/oauth-success")
+      .redirect("https://algocrush-frontend.vercel.app/oauth-success")
       .state("token", token, {
         isHttpOnly: true,
         isSecure: false,

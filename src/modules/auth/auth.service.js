@@ -135,7 +135,6 @@ const googleCallbackHandler = async (req, h) => {
         isSecure: true,
         isSameSite: "Lax",
         path: "/",
-        domain: "onrender.com" // ✅ Add this
       });
 
   } catch (err) {

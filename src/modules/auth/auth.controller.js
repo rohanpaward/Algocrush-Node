@@ -32,16 +32,12 @@ const startGoogleOAuthcontroller = async (req, res) => {
 const googleCallbackController = async (req, res) => {
   return googleCallbackHandler(req, res); // ✅ same
 };
+
 const getMeController = async (req, h) => {
   try {
     const { schemaName } = req.app;
 
-    // ✅ Read from Authorization header instead of cookie
-    const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(" ")[1]; // Extract Bearer token
-
-    console.log(req,'this si req')
-    console.log(authHeader,'this is authheader')
+    const token = req.state.token; // ✅ read here
 
     const serviceResponse = await getMeHandler(token, schemaName);
 

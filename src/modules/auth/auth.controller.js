@@ -37,7 +37,11 @@ const getMeController = async (req, h) => {
   try {
     const { schemaName } = req.app;
 
-    const token = req.state.token; // ✅ read here
+    // ✅ Read from Authorization header instead of cookie
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(" ")[1];
+    console.log(authHeader,'this is authheader')
+    console.log(req,'this is request')
 
     const serviceResponse = await getMeHandler(token, schemaName);
 
@@ -48,7 +52,6 @@ const getMeController = async (req, h) => {
     return h.response({ message: "Internal Server Error" }).code(500);
   }
 };
-
 module.exports = [
   {
     method: httpProtocols.GET,

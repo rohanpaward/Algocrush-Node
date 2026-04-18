@@ -129,13 +129,14 @@ const googleCallbackHandler = async (req, h) => {
 
     return h
       // .redirect("http://localhost:5173/oauth-success")
-      .redirect("https://algocrush-frontend.onrender.com/oauth-success")
-      .state("token", token, {
-        isHttpOnly: true,
-        isSecure: true,
-        isSameSite: "None",
-        path: "/",
-      });
+      // .redirect("https://algocrush-frontend.onrender.com/oauth-success")
+      .redirect(`https://algocrush-frontend.onrender.com/oauth-success?token=${token}`)
+      // .state("token", token, {
+      //   isHttpOnly: true,
+      //   isSecure: true,
+      //   isSameSite: "None",
+      //   path: "/",
+      // });
 
   } catch (err) {
     console.error("OAuth Error:", err);

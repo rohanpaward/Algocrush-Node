@@ -79,8 +79,6 @@ const fetchRoleService = async () => {
     }
   };
 
-
-
   const fetchLookingforService = async () => {
 
     // const t = await sequelize.transaction();

@@ -26,8 +26,8 @@ const init = async () => {
       cookie: {
         name: 'oauth-session',
         password: process.env.COOKIE_PASSWORD,
-        isSecure: false, // ⚠️ true in production (HTTPS)
-        isSameSite: "Lax",
+        isSecure: true, // ⚠️ true in production (HTTPS)
+        isSameSite: "None",
       },
       redirectTo: false,
     });

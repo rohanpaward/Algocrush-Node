@@ -40,6 +40,9 @@ const getMeController = async (req, h) => {
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(" ")[1]; // Extract Bearer token
 
+    console.log(req,'this si req')
+    console.log(authHeader,'this is authheader')
+
     const serviceResponse = await getMeHandler(token, schemaName);
 
     return h.response(serviceResponse).code(200);

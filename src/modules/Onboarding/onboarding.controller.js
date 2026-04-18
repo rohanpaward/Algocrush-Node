@@ -38,19 +38,19 @@ const fetchRolesHandler = async (req, res) => {
       const payload = req.payload;
       const { schemaName } = req.app;
   
-      // 🔥 1. Get token from cookie
-      const token = req.state.token;
+      // ✅ Get token from Authorization header
+      const authHeader = req.headers.authorization;
+      const token = authHeader && authHeader.split(" ")[1];
   
       if (!token) {
-        return h.response({ message: "Unauthorized" }).code(401);
+        return res.response({ message: "Unauthorized" }).code(401);
       }
   
-      // 🔥 2. Decode token
+      // ✅ Decode token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  
       const userId = decoded.userId;
   
-      // 🔥 3. Call service with userId
+      // ✅ Call service with userId
       const serviceResponse = await OnboardingService.registerUserService(
         payload,
         userId,

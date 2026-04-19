@@ -40,8 +40,6 @@ const getMeController = async (req, h) => {
     // ✅ Read from Authorization header instead of cookie
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(" ")[1];
-    console.log(authHeader,'this is authheader')
-    console.log(req,'this is request')
 
     const serviceResponse = await getMeHandler(token, schemaName);
 

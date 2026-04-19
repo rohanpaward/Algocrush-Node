@@ -12,9 +12,8 @@ const google = new arctic.Google(
   process.env.REDIRECT_URI
 );
 
-// ==============================
+
 // START OAUTH
-// ==============================
 const startGoogleOAuth = async (req, h) => {
   const state = arctic.generateState();
   const codeVerifier = arctic.generateCodeVerifier();
@@ -30,9 +29,7 @@ const startGoogleOAuth = async (req, h) => {
   return h.redirect(url);
 };
 
-// ==============================
 // CALLBACK
-// ==============================
 const googleCallbackHandler = async (req, h) => {
   try {
     const { code, state } = req.query;
@@ -43,7 +40,7 @@ const googleCallbackHandler = async (req, h) => {
       return h.response("Invalid state").code(400);
     }
 
-    // 🔥 Exchange code
+    //  Exchange code
     const tokens = await google.validateAuthorizationCode(
       code,
       session.codeVerifier
@@ -51,7 +48,7 @@ const googleCallbackHandler = async (req, h) => {
 
     const accessToken = tokens.accessToken();
 
-    // 🔥 Fetch Google user
+    //  Fetch Google user
     const response = await fetch(
       "https://www.googleapis.com/oauth2/v2/userinfo",
       {
@@ -63,11 +60,9 @@ const googleCallbackHandler = async (req, h) => {
 
     const googleUser = await response.json();
 
-    // ==============================
-    // ✅ CLEAN DB LOGIC
-    // ==============================
+    // CLEAN DB LOGIC
 
-    // 1️⃣ Find auth provider
+    // Find auth provider
     let authProvider = await auth_providers.findOne({
       where: {
         provider: "google",
@@ -78,7 +73,7 @@ const googleCallbackHandler = async (req, h) => {
     let user;
     
     if (authProvider && authProvider.user_id) {
-      // ✅ valid existing user
+      // valid existing user
       user = await Users.findByPk(authProvider.user_id);
     }
     
@@ -88,7 +83,7 @@ const googleCallbackHandler = async (req, h) => {
       }
     })
 
-    // 🔥 HANDLE BROKEN / FIRST TIME CASE
+    //  HANDLE BROKEN / FIRST TIME CASE
     if (!user) {
       // create user
       user = await Users.create({
@@ -99,7 +94,7 @@ const googleCallbackHandler = async (req, h) => {
       });
     
       if (authProvider) {
-        // 🔥 FIX existing row
+        // FIX existing row
         await authProvider.update({
           user_id: user.id,
         });
@@ -114,9 +109,7 @@ const googleCallbackHandler = async (req, h) => {
       }
     }
 
-    // ==============================
-    // ✅ CREATE JWT
-    // ==============================
+    // CREATE JWT
 
     const token = jwt.sign(
       {
@@ -127,10 +120,12 @@ const googleCallbackHandler = async (req, h) => {
       { expiresIn: "1h" }
     );
 
+    const frontendurl = process.env.FRONTEND_URL
+
     return h
-      // .redirect("http://localhost:5173/oauth-success")
+      // .redirect("http://localhost:5173/oauth-success?token")
       // .redirect("https://algocrush-frontend.onrender.com/oauth-success")
-      .redirect(`https://algocrush-frontend.onrender.com/oauth-success?token=${token}`)
+      .redirect(`${frontendurl}/oauth-success?token=${token}`)
       // .state("token", token, {
       //   isHttpOnly: true,
       //   isSecure: true,
@@ -144,9 +139,7 @@ const googleCallbackHandler = async (req, h) => {
   } 
 };
 
-// ==============================
 // GET ME
-// ==============================
 const getMeHandler = async (token) => {
   try {
     if (!token) throw new Error("Unauthorized");

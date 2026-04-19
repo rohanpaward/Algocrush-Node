@@ -52,7 +52,7 @@ const fetchRoleService = async () => {
 
   const fetchSkillsByDomainService = async (domainIds) => {
     try {
-      // ✅ Ensure it's always an array
+      // Ensure it's always an array
       if (!Array.isArray(domainIds)) {
         if (typeof domainIds === 'string') {
           domainIds = domainIds.split(',').map(Number);
@@ -97,7 +97,6 @@ const fetchRoleService = async () => {
   //register user!!
   const registerUserService = async (data, userId, schemaName) => {
     const t = await sequelize.transaction();
-    console.log(data,'thhis is the payload')
     try {
       const {
         name,
@@ -120,7 +119,7 @@ const fetchRoleService = async () => {
         }
       })
   
-      // 🔥 1. UPDATE EXISTING USER
+      //  1. UPDATE EXISTING USER
       await User.schema(schemaName).update(
         {
           username: name,
@@ -143,7 +142,7 @@ const fetchRoleService = async () => {
         }
       );
   
-      // 🔥 2. Domains
+      //  2. Domains
       if (domainIds?.length) {
         await UserDomainMapping.schema(schemaName).bulkCreate(
           domainIds.map((d) => ({
@@ -154,7 +153,7 @@ const fetchRoleService = async () => {
         );
       }
   
-      // 🔥 3. Skills
+      //  3. Skills
       if (skillIds?.length) {
         await UserSkillMapping.schema(schemaName).bulkCreate(
           skillIds.map((s) => ({

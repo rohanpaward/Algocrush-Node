@@ -32,6 +32,10 @@ const fetchRolesHandler = async (req, res) => {
     return responseToolkit.sendResponse(response, res);
   };
 
+  const fetchbuildtypes = async (req, res) => {
+    const response = await OnboardingService.fetchbuildtypesService();
+    return responseToolkit.sendResponse(response, res);
+  };
 
   const registerUser = async (req, res) => {
     try {
@@ -114,5 +118,13 @@ module.exports = [
       auth:false
     },
     handler:registerUser,
+  },
+  {
+    method:httpProtocols.GET,
+    path:onboardingEndpoints.GET_BUILD_TYPES,
+    options:{
+      auth:false
+    },
+    handler:fetchbuildtypes
   }
 ];

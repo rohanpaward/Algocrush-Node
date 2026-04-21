@@ -17,6 +17,8 @@ const User = require('../../schema/users')
 const UserDomainMapping = require('../../schema/user_domains');
 const UserSkillMapping = require('../../schema/user_skills');
 const statuses = require('../../schema/statuses');
+const build_types = require('../../schema/build_types');
+const user_build_types = require('../../schema/user_build_types');
 
 
 
@@ -83,8 +85,26 @@ const fetchRoleService = async () => {
 
     // const t = await sequelize.transaction();
     try {
-      const serviceResponse = await lookingFor.findAll({})
-      // await t.commit();
+      const serviceResponse = await lookingFor.findAll({
+        attributes: ["id", "name", "label", "description"],
+      });      // await t.commit();
+      logger.info('Data fetched successfully');
+      return formatResponse(serviceResponse, 200);
+    } catch (error) {
+    //   await t.rollback();
+      logger.info(error);
+      return formatResponse(error, 500);
+    }
+  };
+
+
+  const fetchbuildtypesService = async () => {
+
+    // const t = await sequelize.transaction();
+    try {
+      const serviceResponse = await build_types.findAll({
+        attributes: ["id", "name", "label"],
+      });      // await t.commit();
       logger.info('Data fetched successfully');
       return formatResponse(serviceResponse, 200);
     } catch (error) {
@@ -97,44 +117,71 @@ const fetchRoleService = async () => {
   //register user!!
   const registerUserService = async (data, userId, schemaName) => {
     const t = await sequelize.transaction();
+  
     try {
       const {
         name,
         avatar,
         roleId,
-        builderType,
+        roleName,
+  
+        CollegeName,
+        studyYear,
+        collabStatus,
+  
+        buildTypeIds,
+        currentBuild,
+  
         projectName,
-        projectDesc,
+        projectProblem,
+        projectChallenge,
+        projectSolution,
+        projectGithubUrl,
+        ProjectLiveUrl,
+  
         githubUrl,
         lookingfor,
         vibeAnswer,
-        domainIds,
-        experience,
-        skillIds,
       } = data;
-
-      const status = await statuses.findOne({
-        where:{
-          name:"active"
-        }
-      })
   
-      //  1. UPDATE EXISTING USER
+      const status = await statuses.findOne({
+        where: { name: "active" },
+      });
+  
+      // 1. UPDATE USER
       await User.schema(schemaName).update(
         {
           username: name,
-          avatar,
+          profile_photo_url: avatar,
+  
+          // Basic
+          college_name: CollegeName,
+          study_year: studyYear,
+          collab_status: collabStatus,
+  
+          // Role
           role_id: roleId,
-          builder_type: builderType,
-          best_product_title: projectName,
-          best_product_description: projectDesc,
-          looking_for_id:lookingfor,
-          best_product_link: githubUrl,
-          looking_for_id: lookingfor,
-          bio_question: vibeAnswer,
-          status_id: status.id, // active
+          role_name: roleName,
+  
+          // Project
+          project_name: projectName,
+          project_problem: projectProblem,
+          project_challenge: projectChallenge,
+          project_solution: projectSolution,
+          project_github_url: projectGithubUrl,
+          project_live_url: ProjectLiveUrl,
+          current_build:currentBuild,
+  
+          // Optional
+          github_url: githubUrl,
+  
+          // Intent
+          looking_for_id: Number(lookingfor),
+          vibe_answer: vibeAnswer,
+  
+          // Status
+          status_id: status?.id,
           profile_completed: true,
-          experience_level:experience,
         },
         {
           where: { id: userId },
@@ -142,23 +189,19 @@ const fetchRoleService = async () => {
         }
       );
   
-      //  2. Domains
-      if (domainIds?.length) {
-        await UserDomainMapping.schema(schemaName).bulkCreate(
-          domainIds.map((d) => ({
-            user_id: userId,
-            domain_id: d,
-          })),
-          { transaction: t }
-        );
-      }
+      // 2. BUILD TYPES MAPPING
+      if (buildTypeIds?.length) {
+        // delete old mappings
+        await user_build_types.schema(schemaName).destroy({
+          where: { user_id: userId },
+          transaction: t,
+        });
   
-      //  3. Skills
-      if (skillIds?.length) {
-        await UserSkillMapping.schema(schemaName).bulkCreate(
-          skillIds.map((s) => ({
+        // insert new mappings
+        await user_build_types.schema(schemaName).bulkCreate(
+          buildTypeIds.map((id) => ({
             user_id: userId,
-            skill_id: s,
+            build_type_id: id,
           })),
           { transaction: t }
         );
@@ -166,8 +209,7 @@ const fetchRoleService = async () => {
   
       await t.commit();
   
-      return formatResponse(userId, 200)
-  
+      return formatResponse(userId, 200);
     } catch (error) {
       await t.rollback();
       throw error;
@@ -179,5 +221,6 @@ const fetchRoleService = async () => {
     fetchSkillsByDomainService,
     fetchDomainService,
     fetchLookingforService,
-    registerUserService
+    registerUserService,
+    fetchbuildtypesService
   }

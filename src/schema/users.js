@@ -40,26 +40,6 @@
         allowNull: true,
       },
 
-      best_product_title: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-
-      best_product_description: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-
-      best_product_link: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-      },
-
-      bio_question: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-      },
-
       profile_completed: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
@@ -74,34 +54,50 @@
         },
       },
 
-      // 🔥 NEW FIELDS (STRICT VALIDATION)
-
-      experience_level: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        validate: {
-          isIn: [['Beginner', 'Intermediate', 'Advanced', 'Expert']],
-        },
+      college_name:{
+        type:DataTypes.STRING,
+        allowNull:true
       },
 
-      availability: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        validate: {
-          isIn: [['FULL_TIME', 'PART_TIME', 'WEEKEND', 'FELXIBLE']],
-        },
+      study_year:{
+        type:DataTypes.STRING,
+        allowNull:true
       },
 
-      builder_type: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        validate: {
-          isIn: [
-            ['Student', 'Hobbyist', 'Indie Hacker', 'Freelancer', 'Professional'],
-          ],
-        },
+      collab_status:{
+        type:DataTypes.STRING,
+        allowNull:true
       },
-
+      role_name:{
+        type:DataTypes.STRING
+      },
+      project_name:{
+        type:DataTypes.STRING,
+        allowNull:true
+      },
+      project_problem:{
+        type:DataTypes.STRING,
+        allowNull:true
+      },
+      project_challenge:{
+        type:DataTypes.STRING,
+        allowNull:true
+      },
+      project_solution:{
+        type:DataTypes.STRING,
+        allowNull:true
+      },
+      project_github_url:{
+        type:DataTypes.STRING,
+      },
+      project_live_url:{
+        type:DataTypes.STRING
+      },      
+      
+      current_build:{
+        type:DataTypes.STRING
+      },
+    
       looking_for_id:{
         type: DataTypes.INTEGER,
         allowNull:true,
@@ -130,28 +126,61 @@
   });
 
 
-
-
   users.joiValidate = (obj) => {
-    const schema = {
+    const schema = Joi.object({
       id: Joi.number().integer(),
+  
       email: Joi.string().email().required(),
+  
       role_id: Joi.number().integer().required(),
+      role_name: Joi.string().optional(),
+  
       username: Joi.string().optional(),
-      profile_photo_url: Joi.string().uri().optional(),
-      best_project_title: Joi.string().optional(),
-      best_project_description: Joi.string().optional(),
-      best_project_link: Joi.string().uri().optional(),
-      bio_question: Joi.string().optional(),
+  
+      profile_photo_url: Joi.string().uri().allow('', null),
+  
+      // Basic Info
+      college_name: Joi.string().required(),
+      study_year: Joi.string()
+        .valid(
+          'year_1',
+          'year_2',
+          'year_3',
+          'year_4_plus',
+          'postgrad',
+          'graduate',
+          'other'
+        )
+        .required(),
+  
+      collab_status: Joi.string()
+        .valid('active', 'selective', 'closed')
+        .required(),
+  
+      // Project (Proof of Work)
+      project_name: Joi.string().required(),
+      project_problem: Joi.string().required(),
+      project_challenge: Joi.string().required(),
+      project_solution: Joi.string().required(),
+  
+      project_github_url: Joi.string().uri().allow('', null),
+      project_live_url: Joi.string().uri().allow('', null),
+  
+      // Intent
       looking_for_id: Joi.number().integer().required(),
+  
+      // System fields
       profile_completed: Joi.boolean().optional(),
       status_id: Joi.number().integer().optional(),
+  
       created_at: Joi.date().optional(),
       updated_at: Joi.date().optional(),
-    };
-
-    return Joi.validate(obj, schema);
+      current_build: Joi.string().optional()
+    });
+  
+    return schema.validate(obj);
   };
+
 
   module.exports = users;
 

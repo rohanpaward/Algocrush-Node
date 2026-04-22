@@ -208,8 +208,12 @@ const fetchRoleService = async () => {
       }
   
       await t.commit();
+
+      const updatedUser = await User.schema(schemaName).findOne({
+        where: { id: userId },
+      });
   
-      return formatResponse(userId, 200);
+      return formatResponse(updatedUser, 200);
     } catch (error) {
       await t.rollback();
       throw error;

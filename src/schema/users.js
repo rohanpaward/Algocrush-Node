@@ -113,7 +113,12 @@
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
       },
+     
+      vibe_answer:{
+        type:DataTypes.STRING
+      }
     },
+  
     {
       tableName: 'users',
       timestamps: false,
@@ -175,7 +180,8 @@
   
       created_at: Joi.date().optional(),
       updated_at: Joi.date().optional(),
-      current_build: Joi.string().optional()
+      current_build: Joi.string().optional(),
+      vibe_answer:Joi.string().optional()
     });
   
     return schema.validate(obj);

@@ -5,6 +5,7 @@ require("dotenv").config();
 const auth_providers = require("../../schema/auth_providers");
 const Users = require("../../schema/users");
 const statuses = require("../../schema/statuses");
+const user_build_types = require("../../schema/user_build_types");
 
 const google = new arctic.Google(
   process.env.GOOGLE_CLIENT_ID,
@@ -147,11 +148,21 @@ const getMeHandler = async (token) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const user = await Users.findByPk(decoded.userId);
-
     if (!user) throw new Error("User not found");
 
+    // 🔥 fetch build types
+    const userBuildTypes = await user_build_types.findAll({
+      where: { user_id: decoded.userId },
+      attributes: ["build_type_id"],
+    });
+
+    const buildTypeIds = userBuildTypes.map(bt => bt.build_type_id);
+
     return {
-      user,
+      user: {
+        ...user.toJSON(),
+        buildTypeIds, // 👈 nested inside user
+      },
       isNewUser: !user.profile_completed,
     };
 

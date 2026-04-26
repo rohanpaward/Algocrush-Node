@@ -10,7 +10,8 @@ const onboardingEndpoints = {
     GET_SKILLS_BY_DOMAIN:'/api/v1/algocrush/get-skill-by-domian',
     GET_LOOKING_FOR: '/api/v1/algocrush/get-looking-for',
     ONBOARD_USER:'/api/v1/algocrush/register-user',
-    GET_BUILD_TYPES:'/api/v1/algocrush/get-build-types'
+    GET_BUILD_TYPES:'/api/v1/algocrush/get-build-types',
+    UPDATE_USER:'/api/v1/algocrush/update-user'
     // LOGIN_CAPTAIN: '/captain/login',
     // LOGOUT: '/logout',
     // USER_REGISTER: '/user/register',

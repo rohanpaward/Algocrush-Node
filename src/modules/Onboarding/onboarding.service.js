@@ -220,11 +220,118 @@ const fetchRoleService = async () => {
     }
   };
 
+  //update user 
+  const updateUserService = async (data, schemaName) => {
+    const t = await sequelize.transaction();
+  
+    try {
+      const {
+        id, // userId from payload
+  
+        username,
+        profile_photo_url,
+  
+        role_id,
+        role_name,
+  
+        college_name,
+        study_year,
+        collab_status,
+  
+        buildTypeIds,
+        current_build,
+  
+        project_name,
+        project_problem,
+        project_challenge,
+        project_solution,
+        project_github_url,
+        project_live_url,
+  
+        github_url,
+        looking_for_id,
+        vibe_answer,
+      } = data;
+  
+      // 1. UPDATE USER
+      await User.schema(schemaName).update(
+        {
+          username,
+          profile_photo_url,
+  
+          // Basic
+          college_name,
+          study_year,
+          collab_status,
+  
+          // Role
+          role_id,
+          role_name,
+  
+          // Project
+          project_name,
+          project_problem,
+          project_challenge,
+          project_solution,
+          project_github_url,
+          project_live_url,
+          current_build,
+  
+          // Optional
+          github_url,
+  
+          // Intent
+          looking_for_id: Number(looking_for_id),
+          vibe_answer,
+  
+          profile_completed: true,
+        },
+        {
+          where: { id },
+          transaction: t,
+        }
+      );
+  
+      // 2. BUILD TYPES (ONLY if provided)
+      if (buildTypeIds) {
+        // delete old
+        await user_build_types.schema(schemaName).destroy({
+          where: { user_id: id },
+          transaction: t,
+        });
+  
+        // insert new
+        if (buildTypeIds.length > 0) {
+          await user_build_types.schema(schemaName).bulkCreate(
+            buildTypeIds.map((btId) => ({
+              user_id: id,
+              build_type_id: btId,
+            })),
+            { transaction: t }
+          );
+        }
+      }
+  
+      await t.commit();
+  
+      // 3. RETURN UPDATED USER
+      const updatedUser = await User.schema(schemaName).findOne({
+        where: { id },
+      });
+  
+      return formatResponse(updatedUser, 200);
+    } catch (error) {
+      await t.rollback();
+      throw error;
+    }
+  };  
+
   module.exports = {
     fetchRoleService, 
     fetchSkillsByDomainService,
     fetchDomainService,
     fetchLookingforService,
     registerUserService,
-    fetchbuildtypesService
+    fetchbuildtypesService,
+    updateUserService
   }

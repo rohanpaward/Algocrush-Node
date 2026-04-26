@@ -118,7 +118,7 @@
         type:DataTypes.STRING
       }
     },
-  
+
     {
       tableName: 'users',
       timestamps: false,

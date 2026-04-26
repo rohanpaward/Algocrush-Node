@@ -1,12 +1,10 @@
 const responseToolkit = require('../../utility/response-toolkit');
 const { httpProtocols } = require('../../utility/constants');
 const { onboardingEndpoints } = require('./onboarding.endpoint');
-const queryParser = require('../../utility/query-parser')
-const OnboardingOptions = require('./onboarding.options');
+
 const OnboardingService = require('./onboarding.service')
 const {fetchDomainService, fetchSkillsByDomainService} = require('./onboarding.service')
 const jwt = require("jsonwebtoken");
-const { options } = require('joi');
 
 
 
@@ -68,6 +66,13 @@ const fetchRolesHandler = async (req, res) => {
       return responseToolkit.sendResponse(error, res);
     }
   };
+
+  const updateUser = async (req, res) => {
+    const payload = req.payload;
+    const schemaName = 'public'
+    const response = await OnboardingService.updateUserService(payload,schemaName);
+    return responseToolkit.sendResponse(response, res);
+  };
   
 
 module.exports = [
@@ -126,5 +131,13 @@ module.exports = [
       auth:false
     },
     handler:fetchbuildtypes
+  },
+  {
+    method:httpProtocols.PUT,
+    path:onboardingEndpoints.UPDATE_USER,
+    options:{
+      auth:false
+    },
+    handler:updateUser
   }
 ];

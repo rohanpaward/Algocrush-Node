@@ -5,6 +5,7 @@
   const { sequelize } = require('../../db');
 
   const statuses = require('./statuses');
+const lookingFor = require('./looking_for');
   // const lookingfor = require('./looking_for')
 
 
@@ -118,7 +119,6 @@
         type:DataTypes.STRING
       }
     },
-
     {
       tableName: 'users',
       timestamps: false,
@@ -128,6 +128,12 @@
   users.belongsTo(statuses, {
     foreignKey: 'status_id',
     targetKey: 'id',
+  });
+
+  users.belongsTo(lookingFor, {
+    foreignKey: 'looking_for_id',
+    targetKey: 'id',
+    as: 'lookingFor' 
   });
 
 

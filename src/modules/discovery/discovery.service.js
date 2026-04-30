@@ -84,7 +84,7 @@ const userFeedService = async (userId, schemaName) => {
                 [
                     literal(`
                         COALESCE(
-                          array_agg("user_build_types->build_type"."name")
+                          array_agg("user_build_types->build_type"."label")
                           FILTER (WHERE "user_build_types->build_type"."name" IS NOT NULL),
                           '{}'
                         )

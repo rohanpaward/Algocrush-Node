@@ -15,39 +15,68 @@ const swipes = require('../../schema/swipes');
 const lookingFor = require('../../schema/looking_for');
 const user_build_types = require('../../schema/user_build_types');
 const build_types = require('../../schema/build_types');
+const matches = require('../../schema/matches');
 
 
 
 //update user 
 const recordSwipeService = async (data, schemaName) => {
     const t = await sequelize.transaction();
-
+  
     try {
-        const {
-            swiper_id,
-            swiped_id,
-            direction
-        } = data;
-
-        // 1. UPDATE USER
-        await swipes.schema(schemaName).create(
+      const { swiper_id, swiped_id, direction } = data;
+  
+      // 1. Insert swipe (ONLY ONCE)
+      await swipes.schema(schemaName).create(
+        {
+          swiper_id,
+          swiped_id,
+          direction
+        },
+        { transaction: t }
+      );
+  
+      let matched = false;
+  
+      // 2. Only check match if LIKE
+      if (direction === 'like') {
+        // check if reverse like exists
+        const reverseSwipe = await swipes.schema(schemaName).findOne({
+          where: {
+            swiper_id: swiped_id,
+            swiped_id: swiper_id,
+            direction: 'like'
+          },
+          transaction: t
+        });
+  
+        if (reverseSwipe) {
+          matched = true;
+  
+          // 3. create match
+          await matches.schema(schemaName).create(
             {
-                swiper_id,
-                swiped_id,
-                direction
-
-            }
-        );
-
-        await t.commit();
-
-
-        return formatResponse("swipe recorded", 200);
+              user_1_id: Math.min(swiper_id, swiped_id),
+              user_2_id: Math.max(swiper_id, swiped_id)
+            },
+            { transaction: t }
+          );
+        }
+      }
+  
+      await t.commit();
+  
+      return formatResponse(
+        matched ? "It's a match 🎉" : "Swipe recorded",
+        200,
+        // { matched }
+      );
+  
     } catch (error) {
-        await t.rollback();
-        throw error;
+      await t.rollback();
+      throw error;
     }
-};
+  };
 
 // user-feed service
 const userFeedService = async (userId, schemaName) => {
@@ -129,7 +158,7 @@ const userFeedService = async (userId, schemaName) => {
 
     } catch (error) {
         logger.info(error)
-        console.error("FULL DB ERROR:", err);
+        console.error("FULL DB ERROR:", error);
         t.rollback()
         throw error;
 

@@ -56,8 +56,8 @@ const recordSwipeService = async (data, schemaName) => {
           // 3. create match
           await matches.schema(schemaName).create(
             {
-              user_1_id: Math.min(swiper_id, swiped_id),
-              user_2_id: Math.max(swiper_id, swiped_id)
+                user_1_id: Math.min(swiper_id, swiped_id),
+                user_2_id: Math.max(swiper_id, swiped_id)
             },
             { transaction: t }
           );
@@ -67,9 +67,11 @@ const recordSwipeService = async (data, schemaName) => {
       await t.commit();
   
       return formatResponse(
-        matched ? "It's a match 🎉" : "Swipe recorded",
-        200,
-        // { matched }
+        {
+          message: matched ? "It's a match 🎉" : "Swipe recorded",
+          matched
+        },
+        200
       );
   
     } catch (error) {

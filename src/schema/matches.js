@@ -15,7 +15,7 @@ const matches = sequelize.define(
       autoIncrement: true,
     },
 
-    user1_id: {
+    user_1_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -25,7 +25,7 @@ const matches = sequelize.define(
       onDelete: 'CASCADE',
     },
 
-    user2_id: {
+    user_2_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -47,21 +47,21 @@ const matches = sequelize.define(
     indexes: [
       {
         unique: true,
-        fields: ['user1_id', 'user2_id'], // UNIQUE constraint
+        fields: ['user_1_id', 'user_2_id'], // UNIQUE constraint
       },
     ],
   }
 );
 
 matches.belongsTo(users, {
-  foreignKey: 'user1_id',
+  foreignKey: 'user_1_id',
   as: 'user1',
   targetKey: 'id',
   onDelete: 'CASCADE',
 });
 
 matches.belongsTo(users, {
-  foreignKey: 'user2_id',
+  foreignKey: 'user_2_id',
   as: 'user2',
   targetKey: 'id',
   onDelete: 'CASCADE',
@@ -71,8 +71,8 @@ matches.belongsTo(users, {
 matches.joiValidate = (obj) => {
   const schema = {
     id: Joi.number().integer(),
-    user1_id: Joi.number().integer().required(),
-    user2_id: Joi.number().integer().required(),
+    user_1_id: Joi.number().integer().required(),
+    user_2_id: Joi.number().integer().required(),
     created_at: Joi.date().optional(),
   };
 

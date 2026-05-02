@@ -82,7 +82,6 @@ const recordSwipeService = async (data, schemaName) => {
 
 // user-feed service
 const userFeedService = async (userId, schemaName) => {
-    const t = await sequelize.transaction();
     try {
         const users = await User.findAll({
             attributes: [

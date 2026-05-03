@@ -16,6 +16,7 @@ const lookingFor = require('../../schema/looking_for');
 const user_build_types = require('../../schema/user_build_types');
 const build_types = require('../../schema/build_types');
 const matches = require('../../schema/matches');
+const chat_rooms = require('../../schema/chat_rooms');
 
 
 
@@ -26,38 +27,55 @@ const recordSwipeService = async (data, schemaName) => {
     try {
       const { swiper_id, swiped_id, direction } = data;
   
-      // 1. Insert swipe (ONLY ONCE)
+      // 1. Insert swipe
       await swipes.schema(schemaName).create(
         {
           swiper_id,
           swiped_id,
-          direction
+          direction,
         },
         { transaction: t }
       );
   
       let matched = false;
   
-      // 2. Only check match if LIKE
       if (direction === 'like') {
-        // check if reverse like exists
+        // 2. Check reverse like
         const reverseSwipe = await swipes.schema(schemaName).findOne({
           where: {
             swiper_id: swiped_id,
             swiped_id: swiper_id,
-            direction: 'like'
+            direction: 'like',
           },
-          transaction: t
+          transaction: t,
         });
   
         if (reverseSwipe) {
           matched = true;
   
-          // 3. create match
-          await matches.schema(schemaName).create(
+          const user1 = Math.min(swiper_id, swiped_id);
+          const user2 = Math.max(swiper_id, swiped_id);
+  
+          // 3. Create match AND GET ID
+          const match = await matches.schema(schemaName).create(
             {
-                user_1_id: Math.min(swiper_id, swiped_id),
-                user_2_id: Math.max(swiper_id, swiped_id)
+              user_1_id: user1,
+              user_2_id: user2,
+              matched_at: new Date(),
+            },
+            { transaction: t }
+          );
+  
+          // THIS IS WHAT YOU WERE MISSING
+          const matchId = match.id;
+  
+          // 4. Create chat room using matchId
+          await chat_rooms.schema(schemaName).create(
+            {
+              match_id: matchId,
+              user_1_id: user1,
+              user_2_id: user2,
+              created_at: new Date(),
             },
             { transaction: t }
           );
@@ -69,13 +87,12 @@ const recordSwipeService = async (data, schemaName) => {
       return formatResponse(
         {
           message: matched ? "It's a match" : "Swipe recorded",
-          matched
+          matched,
         },
         200
       );
-  
     } catch (error) {
-      console.log(error,'this is error')
+      console.log(error, 'this is error');
       await t.rollback();
       throw error;
     }

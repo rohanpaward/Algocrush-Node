@@ -1,5 +1,5 @@
 // Sequelize
-const { Op, Sequelize, col, literal, fn } = require('sequelize');
+const { Op, Sequelize, col, literal, fn, where } = require('sequelize');
 const { sequelize } = require('../../../db');
 
 // Utilities
@@ -68,13 +68,14 @@ const recordSwipeService = async (data, schemaName) => {
   
       return formatResponse(
         {
-          message: matched ? "It's a match 🎉" : "Swipe recorded",
+          message: matched ? "It's a match" : "Swipe recorded",
           matched
         },
         200
       );
   
     } catch (error) {
+      console.log(error,'this is error')
       await t.rollback();
       throw error;
     }
@@ -147,7 +148,17 @@ const userFeedService = async (userId, schemaName) => {
             where: {
                 id: { [Op.ne]: userId },
                 collab_status: { [Op.ne]: 'closed' },
-                profile_completed: true
+                profile_completed: true,
+
+                [Op.and]: where(
+                    literal(`NOT EXISTS (
+                        SELECT 1
+                        FROM swipes s
+                        WHERE s.swiper_id = ${userId}
+                        AND s.swiped_id = "users"."id"
+                    )`),
+                    true
+                )
             },
 
             group: ['users.id', 'lookingFor.label'],
@@ -165,9 +176,6 @@ const userFeedService = async (userId, schemaName) => {
 
     }
 }
-
-
-
 
 module.exports = {
     userFeedService,

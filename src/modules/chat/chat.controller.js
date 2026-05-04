@@ -1,6 +1,5 @@
 const responseToolkit = require('../../utility/response-toolkit');
 const { httpProtocols } = require('../../utility/constants');
-// const discoveryService = require('./discovery.service');
 const chatService = require('./chat.service')
 const { chatEndpoints } = require('./chat.endpoints');
 
@@ -13,6 +12,13 @@ const { chatEndpoints } = require('./chat.endpoints');
     return responseToolkit.sendResponse(serviceResponse, res);
   };
 
+  const getMessagesByConversationIdHandler = async (req, res) =>{
+     const payload = req.payload
+     const schemaName = 'public'
+     const serviceResponse = await chatService.getMessagesByConversationIdService(payload,schemaName);
+     return responseToolkit.sendResponse(serviceResponse, res);
+    
+    }
   
 
 module.exports = [
@@ -22,7 +28,14 @@ module.exports = [
     options: {
         auth:false
     },
-    handler: fetchAllChatsHandler,
-    
+    handler: fetchAllChatsHandler,    
   },
+  {
+    method: httpProtocols.POST,
+    path: chatEndpoints.GET_CHAT_BY_ID,
+    options:{
+        auth:false
+    },
+    handler:getMessagesByConversationIdHandler
+  }
 ];

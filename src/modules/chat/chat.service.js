@@ -7,11 +7,10 @@ const { formatResponse } = require('../../utility/response-toolkit');
 
 // Logger
 const { logger } = require('../../utility/logger');
+const { getIO } = require('../../sockets');
+const messages = require('../../schema/messages');
+const users = require('../../schema/users');
 
-// Joi
-// const chat_rooms = require('../../schema/chat_rooms');
-// const users = require('../../schema/users');
-// const messages = require('../../schema/messages');
 
 const fetchAllChatsService = async (userId, schemaName) => {
     try {
@@ -21,6 +20,7 @@ const fetchAllChatsService = async (userId, schemaName) => {
           cr.last_message,
           cr.last_message_at,
           cr.last_message_by,
+          cr.created_at,
   
           CASE 
             WHEN cr.user_1_id = :userId THEN cr.user_2_id
@@ -72,6 +72,47 @@ const fetchAllChatsService = async (userId, schemaName) => {
     }
   };
 
+  const getMessagesByConversationIdService = async (payload, schemaName) => {
+    const t = await sequelize.transaction();
+  
+    try {
+      const { roomId, offset = 0 } = payload;
+  
+      const Messages = await messages.schema(schemaName).findAll({
+        where: {
+          room_id: roomId,
+        },
+        include: [
+          {
+            model: users.schema(schemaName),
+            as: "sender",
+            attributes: ["username", "profile_photo_url"],
+          },
+        ],
+        attributes: [
+          "id",
+          "sender_id",
+          "content",
+          "is_read",
+          "created_at",
+        ],
+        order: [["created_at", "ASC"]],
+        limit: 50,
+        offset,
+        transaction: t,
+      });
+  
+      await t.commit();
+  
+      return formatResponse(Messages, 200);
+  
+    } catch (e) {
+      console.log(e,'this is error')
+      await t.rollback();
+      throw e;
+    }
+  };
 module.exports = {
-    fetchAllChatsService
+    fetchAllChatsService,
+    getMessagesByConversationIdService
 }

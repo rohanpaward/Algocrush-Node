@@ -2,6 +2,7 @@ require('dotenv').config();
 const Hapi = require('@hapi/hapi');
 const { sequelize, testConnection } = require('./db');
 const routes = require('./src/router');
+const { initSocket, initChatSocket, initSocketHandlers } = require('./src/sockets');
 
 const init = async () => {
   try {
@@ -18,7 +19,7 @@ const init = async () => {
 
     await testConnection();
 
-    // ✅ 1. REGISTER COOKIE PLUGIN
+    //  1. REGISTER COOKIE PLUGIN
     await hapiServer.register(require('@hapi/cookie'));
 
     // ✅ 2. DEFINE SESSION STRATEGY
@@ -39,6 +40,8 @@ const init = async () => {
     hapiServer.route(routes);
 
     await hapiServer.start();
+    initSocket(hapiServer.listener)
+    initSocketHandlers()
     console.log(`Server running at: ${hapiServer.info.uri}`);
   } catch (err) {
     console.error(' Startup error:', err);

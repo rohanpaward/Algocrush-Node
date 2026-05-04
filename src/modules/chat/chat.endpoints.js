@@ -5,10 +5,8 @@
  */
 
 const chatEndpoints = {
-    // SWIPE:'/api/v1/algocrush/discovery/swipe-user',
-    // USER_FEED:'/api/v1/algocrush/discovery/user-feed'
-
-    GET_ALL_CHATS:'/api/v1/algocrush/chat/get-all-chats'
+   GET_ALL_CHATS:'/api/v1/algocrush/chat/get-all-chats',
+   GET_CHAT_BY_ID:'/api/v1/algocrush/chat/get-convo-by-id'
     
   };
   module.exports = {

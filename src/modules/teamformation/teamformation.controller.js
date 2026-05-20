@@ -12,6 +12,13 @@ const  teamformationService = require('./teamformation.service')
     return responseToolkit.sendResponse(response, res);
   };
 
+  const getHackathonRequestHandler = async (req, res) => {
+    const payload = req.payload;
+    const schemaName = 'public'
+    const response = await teamformationService.getHackathonRequestService(payload,schemaName);
+    return responseToolkit.sendResponse(response, res);
+  };
+
 
 module.exports = [
   {
@@ -23,5 +30,13 @@ module.exports = [
     handler: createHackathonRequestHandler,
     
   },
+  {
+    method:httpProtocols.POST,
+    path:teamformationEndpoints.HACKTHON_REQUEST,
+    options:{
+        auth:false
+    },
+    handler:getHackathonRequestHandler
+  }
   
 ];

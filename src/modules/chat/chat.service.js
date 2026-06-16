@@ -10,6 +10,7 @@ const { logger } = require('../../utility/logger');
 const { getIO } = require('../../sockets');
 const messages = require('../../schema/messages');
 const users = require('../../schema/users');
+const request_messages = require('../../schema/request_message');
 
 
 const fetchAllChatsService = async (userId, schemaName) => {
@@ -76,9 +77,14 @@ const fetchAllChatsService = async (userId, schemaName) => {
     const t = await sequelize.transaction();
   
     try {
-      const { roomId, offset = 0 } = payload;
+      const { roomId, messageType, offset = 0 } = payload;
   
-      const Messages = await messages.schema(schemaName).findAll({
+      const MessageModel =
+        messageType === "request"
+          ? request_messages
+          : messages; // collab
+  
+      const Messages = await MessageModel.schema(schemaName).findAll({
         where: {
           room_id: roomId,
         },
@@ -105,9 +111,8 @@ const fetchAllChatsService = async (userId, schemaName) => {
       await t.commit();
   
       return formatResponse(Messages, 200);
-  
     } catch (e) {
-      console.log(e,'this is error')
+      console.log(e, "this is error");
       await t.rollback();
       throw e;
     }

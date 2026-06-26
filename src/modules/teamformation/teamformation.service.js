@@ -213,7 +213,67 @@ const getHackathonRequestService = async (payload, schemaName) => {
 };
 
 
+const getHackathonSentRequestsService = async (payload, schemaName) => {
+    try {
+        const { userId } = payload;
+
+        const requests = await hackathon_requests.schema(schemaName).findAll({
+            where: {
+                applicant_id: userId,
+            },
+
+            include: [
+                {
+                    model: hackathon_posts.schema(schemaName),
+                    as: "post",
+                    attributes: [
+                        "id",
+                        "project_name",
+                        "hackathon_name",
+                        "category",
+                        "creator_id",
+                        "status",
+                    ],
+                    include: [
+                        {
+                            model: users.schema(schemaName),
+                            as: "creator",
+                            attributes: [
+                                "id",
+                                "username",
+                                "profile_photo_url",
+                            ],
+                        },
+                    ],
+                },
+
+                {
+                    model: hackathon_roles.schema(schemaName),
+                    as: "role",
+                    attributes: [
+                        "id",
+                        "role_name",
+                    ],
+                },
+            ],
+
+            order: [["created_at", "DESC"]],
+        });
+
+        return formatResponse(
+            "Sent requests fetched successfully",
+            200,
+            requests
+        );
+    } catch (error) {
+        console.log(error);
+        logger.info(error);
+        return formatResponse("Internal Server Error", 500);
+    }
+};
+
 module.exports = {
     createHackathonRequestService,
-    getHackathonRequestService
+    getHackathonRequestService,
+    getHackathonSentRequestsService
 }

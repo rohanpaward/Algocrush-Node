@@ -261,9 +261,9 @@ const getHackathonSentRequestsService = async (payload, schemaName) => {
         });
 
         return formatResponse(
-            "Sent requests fetched successfully",
+            requests,
             200,
-            requests
+            'Sent requests fetched successfully'
         );
     } catch (error) {
         console.log(error);

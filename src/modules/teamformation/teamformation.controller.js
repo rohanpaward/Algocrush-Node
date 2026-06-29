@@ -26,6 +26,19 @@ const  teamformationService = require('./teamformation.service')
     return responseToolkit.sendResponse(response, res);
   };
 
+  const acceptRequest = async(req, res)=>{
+    const payload = req.payload;
+    const schemaName = 'public'
+    const response = await teamformationService.acceptRequest(payload,schemaName);
+    return responseToolkit.sendResponse(response, res);
+  }
+
+  const rejectRequest = async(req, res)=>{
+    const payload = req.payload;
+    const schemaName = 'public'
+    const response = await teamformationService.rejectRequestService(payload,schemaName);
+    return responseToolkit.sendResponse(response, res);
+  }
 
 module.exports = [
   {
@@ -52,6 +65,23 @@ module.exports = [
         auth:false
     },
     handler:getHackathonSentRequestsHandler
+  },
+  {
+    method:httpProtocols.POST,
+    path:teamformationEndpoints.HACKATHON_ACCEPT_REQUEST,
+    options:{
+        auth:false
+    },
+    handler:acceptRequest
+  },
+  {
+    method:httpProtocols.POST,
+    path:teamformationEndpoints.HACKATHON_REJECT_REQUEST,
+    options:{
+        auth:false
+    },
+    handler:rejectRequest
+    
   }
   
 ];

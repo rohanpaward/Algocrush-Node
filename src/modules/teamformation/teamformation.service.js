@@ -14,6 +14,7 @@ const hackathon_roles = require('../../schema/hackathon_roles');
 const hackathon_requests = require('../../schema/hackathon_requests');
 const chat_rooms = require('../../schema/chat_rooms');
 const users = require('../../schema/users');
+const hackathon_team_members = require('../../schema/hackathon_team_members')
 
 const createHackathonRequestService = async (payload, schemaName) => {
     const t = await sequelize.transaction();
@@ -272,8 +273,155 @@ const getHackathonSentRequestsService = async (payload, schemaName) => {
     }
 };
 
+const acceptRequest = async (req, res) => {
+    const t = await sequelize.transaction();
+
+    try {
+        const {
+            requestId,
+            userId,
+            postId,
+            roleId,
+        } = req;
+
+        // Check if post exists
+        const post = await hackathon_posts.findOne({
+            where: {
+                id: postId,
+            },
+            transaction: t,
+        });
+
+        if (!post) {
+            await t.rollback();
+            return formatResponse("Hackathon post not found.", 404);
+        }
+
+        const creatorId = post.creator_id;
+
+        // Update request status
+        await hackathon_requests.update(
+            {
+                status: "accepted",
+            },
+            {
+                where: {
+                    id: requestId,
+                },
+                transaction: t,
+            }
+        );
+
+        // Check if owner already exists in team
+        const ownerExists = await hackathon_team_members.findOne({
+            where: {
+                post_id: postId,
+                user_id: creatorId,
+            },
+            transaction: t,
+        });
+
+        // Insert owner only once
+        if (!ownerExists) {
+            await hackathon_team_members.create(
+                {
+                    post_id: postId,
+                    user_id: creatorId,
+                    member_type: "creator",
+                },
+                {
+                    transaction: t,
+                }
+            );
+        }
+
+        // Check if applicant already exists in team
+        const memberExists = await hackathon_team_members.findOne({
+            where: {
+                post_id: postId,
+                user_id: userId,
+            },
+            transaction: t,
+        });
+
+        // Insert applicant only once
+        if (!memberExists) {
+            await hackathon_team_members.create(
+                {
+                    post_id: postId,
+                    user_id: userId,
+                    role_id: roleId,
+                    request_id: requestId,
+                    member_type: "member",
+                },
+                {
+                    transaction: t,
+                }
+            );
+        }
+
+        await t.commit();
+
+        return formatResponse(
+            "Request accepted successfully.",
+            200
+        );
+
+    } catch (error) {
+        await t.rollback();
+
+        console.log(error);
+        logger.error(error);
+
+        return formatResponse(
+            "Internal Server Error",
+            500
+        );
+    }
+};
+
+
+const rejectRequestService = async (req, res) => {
+    try {
+        const { requestId } = req;
+
+        const request = await hackathon_requests.findOne({
+            where: {
+                id: requestId,
+            },
+        });
+
+        if (!request) {
+            return formatResponse(
+                "Hackathon request not found.",
+                404
+            );
+        }
+
+        await request.update({
+            status: "rejected",
+        });
+
+        return formatResponse(
+            "Request rejected successfully.",
+            200
+        );
+    } catch (error) {
+        console.log(error);
+        logger.error(error);
+
+        return formatResponse(
+            "Internal Server Error",
+            500
+        );
+    }
+};
+
+
 module.exports = {
     createHackathonRequestService,
     getHackathonRequestService,
-    getHackathonSentRequestsService
+    getHackathonSentRequestsService,
+    acceptRequest,
+    rejectRequestService
 }

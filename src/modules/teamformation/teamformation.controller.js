@@ -40,6 +40,13 @@ const  teamformationService = require('./teamformation.service')
     return responseToolkit.sendResponse(response, res);
   }
 
+  const getTeams = async(req, res)=>{
+    const payload = req.payload;
+    const schemaName = 'public'
+    const response = await teamformationService.getTeamsService(payload,schemaName);
+    return responseToolkit.sendResponse(response, res);
+  }
+
 module.exports = [
   {
     method: httpProtocols.POST,
@@ -81,7 +88,14 @@ module.exports = [
         auth:false
     },
     handler:rejectRequest
-    
+  },
+  {
+    method:httpProtocols.POST,
+    path:teamformationEndpoints.GET_HACKATHON_TEAMS,
+    options:{
+        auth:false
+    },
+    handler:getTeams
   }
   
 ];

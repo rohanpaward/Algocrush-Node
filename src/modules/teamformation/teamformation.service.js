@@ -417,11 +417,52 @@ const rejectRequestService = async (req, res) => {
     }
 };
 
+const getTeamsService = async (req, res) => {
+    try {
+        const { userId } = req;
+
+        const teams = await hackathon_team_members.findAll({
+            where: {
+                user_id: userId,
+            },
+            include: [
+                {
+                    model: hackathon_posts,
+                    as: "post",
+                    attributes: [
+                        "id",
+                        "project_name",
+                        "hackathon_name",
+                        "status",
+                        "creator_id",
+                    ],
+                },
+            ],
+            order: [["joined_at", "DESC"]],
+        });
+
+        return formatResponse(
+            teams,
+            200,
+            "Teams fetched successfully.",
+        );
+    } catch (error) {
+        console.log(error);
+        logger.error(error);
+
+        return formatResponse(
+            "Internal Server Error",
+            500
+        );
+    }
+};
+
 
 module.exports = {
     createHackathonRequestService,
     getHackathonRequestService,
     getHackathonSentRequestsService,
     acceptRequest,
-    rejectRequestService
+    rejectRequestService,
+    getTeamsService
 }

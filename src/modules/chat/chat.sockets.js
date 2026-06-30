@@ -74,10 +74,10 @@ module.exports = (socket) => {
         // ====================================
         // DIRECT CHAT MESSAGE
         // ====================================
-        else if (type === "direct") {
+        else if (type === "collab") {
     
           // validate room exists
-          const room = await hackathon_requests.findOne({
+          const room = await chat_rooms.findOne({
             where: {
               id: roomId
             }
@@ -91,7 +91,7 @@ module.exports = (socket) => {
     
           }
     
-          saved = await request_messages.create({
+          saved = await messages.create({
             room_id: roomId,
             sender_id: senderId,
             content: text,

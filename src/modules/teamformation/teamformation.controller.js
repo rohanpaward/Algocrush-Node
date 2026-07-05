@@ -47,6 +47,13 @@ const  teamformationService = require('./teamformation.service')
     return responseToolkit.sendResponse(response, res);
   }
 
+  const getTeamMessages = async(req, res)=>{
+    const payload = req.payload;
+    const schemaName = 'public'
+    const response = await teamformationService.getTeamMessagesService(payload,schemaName);
+    return responseToolkit.sendResponse(response, res);
+  }
+
 module.exports = [
   {
     method: httpProtocols.POST,
@@ -96,6 +103,14 @@ module.exports = [
         auth:false
     },
     handler:getTeams
+  },
+  {
+    method:httpProtocols.POST,
+    path:teamformationEndpoints.GET_TEAM_MESSAGES,
+    options:{
+      auth:false
+    },
+    handler:getTeamMessages
   }
   
 ];

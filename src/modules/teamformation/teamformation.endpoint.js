@@ -10,7 +10,8 @@ const teamformationEndpoints = {
     HACKTHON_SENT_REQUESTS:'/api/v1/algocrush/teamformation/hackathon-sent-requests',
     HACKATHON_ACCEPT_REQUEST: '/api/v1/algocrush/teamformation/accept-request',
     HACKATHON_REJECT_REQUEST:'/api/v1/algocrush/teamformation/reject-request',
-    GET_HACKATHON_TEAMS:'/api/v1/algocrush/teamformation/get-hackathon-teams'
+    GET_HACKATHON_TEAMS:'/api/v1/algocrush/teamformation/get-hackathon-teams',
+    GET_TEAM_MESSAGES:'/api/v1/algocrush/teamformation/get-hackathon-team-messages'
     
   };
   module.exports = {

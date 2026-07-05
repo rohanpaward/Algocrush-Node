@@ -14,7 +14,8 @@ const hackathon_roles = require('../../schema/hackathon_roles');
 const hackathon_requests = require('../../schema/hackathon_requests');
 const chat_rooms = require('../../schema/chat_rooms');
 const users = require('../../schema/users');
-const hackathon_team_members = require('../../schema/hackathon_team_members')
+const hackathon_team_members = require('../../schema/hackathon_team_members');
+const hackathon_group_messages = require('../../schema/hackathon_group_messages');
 
 const createHackathonRequestService = async (payload, schemaName) => {
     const t = await sequelize.transaction();
@@ -457,6 +458,42 @@ const getTeamsService = async (req, res) => {
     }
 };
 
+const getTeamMessagesService = async(req, res)=>{
+    const { roomId } = req;
+    
+    try{
+        const messages = await hackathon_group_messages.findAll({
+            where: {
+                post_id: roomId,
+            },
+            include: [
+                {
+                    model: users,
+                    as: 'sender',
+                    attributes: ['id', 'username', 'profile_photo_url'],
+                },
+            ],
+            order: [['created_at', 'ASC']],
+        });
+
+        return formatResponse(
+            messages,
+            200,
+            "Teams messages fetched successfully.",
+        );
+
+    }catch(e){
+        console.log(error);
+        logger.error(error);
+
+        return formatResponse(
+            "Internal Server Error",
+            500
+        );
+
+    }
+};
+
 
 module.exports = {
     createHackathonRequestService,
@@ -464,5 +501,6 @@ module.exports = {
     getHackathonSentRequestsService,
     acceptRequest,
     rejectRequestService,
-    getTeamsService
+    getTeamsService,
+    getTeamMessagesService
 }

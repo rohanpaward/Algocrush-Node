@@ -1,7 +1,8 @@
 const responseToolkit = require('../../utility/response-toolkit');
 const { httpProtocols } = require('../../utility/constants');
 const {teamformationEndpoints} = require('./teamformation.endpoint')
-const  teamformationService = require('./teamformation.service')
+const  teamformationService = require('./teamformation.service');
+const { auth } = require('google-auth-library');
 
 
 
@@ -51,6 +52,13 @@ const  teamformationService = require('./teamformation.service')
     const payload = req.payload;
     const schemaName = 'public'
     const response = await teamformationService.getTeamMessagesService(payload,schemaName);
+    return responseToolkit.sendResponse(response, res);
+  }
+
+  const getGroupInfo = async (req, res)=>{
+    const payload = req.params;
+    const schemaName = 'public'
+    const response = await teamformationService.getGroupInfoService(payload,schemaName);
     return responseToolkit.sendResponse(response, res);
   }
 
@@ -111,6 +119,14 @@ module.exports = [
       auth:false
     },
     handler:getTeamMessages
+  },
+  {
+    method:httpProtocols.GET,
+    path:teamformationEndpoints.GET_GROUP_INFO,
+    options:{
+     auth:false
+    },
+    handler:getGroupInfo
   }
   
 ];

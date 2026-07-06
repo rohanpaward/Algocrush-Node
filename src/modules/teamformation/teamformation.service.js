@@ -494,6 +494,91 @@ const getTeamMessagesService = async(req, res)=>{
     }
 };
 
+const getGroupInfoService = async (payload, schemaName) => {
+    try {
+        const { postId } = payload;
+
+        const post = await hackathon_posts.schema(schemaName).findOne({
+            where: {
+                id: postId,
+            },
+            attributes: [
+                "id",
+                "project_name",
+                "hackathon_name",
+                "status",
+                "creator_id",
+            ],
+        });
+
+        if (!post) {
+            return formatResponse(
+                "Group not found.",
+                404
+            );
+        }
+
+        const members = await hackathon_team_members.schema(schemaName).findAll({
+            where: {
+                post_id: postId,
+            },
+            include: [
+                {
+                    model: users.schema(schemaName),
+                    as: "user",
+                    attributes: [
+                        "id",
+                        "username",
+                        "profile_photo_url",
+                    ],
+                },
+                {
+                    model: hackathon_roles.schema(schemaName),
+                    as: "role",
+                    attributes: [
+                        "id",
+                        "role_name",
+                    ],
+                    required: false,
+                },
+            ],
+            order: [
+                ["joined_at", "ASC"],
+            ],
+        });
+
+        const formattedMembers = members.map((member) => ({
+            id: member.user.id,
+            username: member.user.username,
+            profile_photo_url: member.user.profile_photo_url,
+            member_type:
+                member.role == null ? "creator" : "member",
+            role_name:
+                member.role == null
+                    ? "Creator"
+                    : member.role.role_name,
+            joined_at: member.joined_at,
+        }));
+
+        return formatResponse(
+            {
+                post,
+                members: formattedMembers,
+            },
+            200,
+            "Group information fetched successfully."
+        );
+    } catch (error) {
+        console.log(error);
+        logger.error(error);
+
+        return formatResponse(
+            "Internal Server Error",
+            500
+        );
+    }
+};
+
 
 module.exports = {
     createHackathonRequestService,
@@ -502,5 +587,6 @@ module.exports = {
     acceptRequest,
     rejectRequestService,
     getTeamsService,
-    getTeamMessagesService
+    getTeamMessagesService,
+    getGroupInfoService
 }

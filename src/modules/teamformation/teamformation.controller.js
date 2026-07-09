@@ -62,6 +62,13 @@ const { auth } = require('google-auth-library');
     return responseToolkit.sendResponse(response, res);
   }
 
+  const updateStatus = async(req, res)=>{
+    const payload = req.payload;
+    const schemaName = 'public'
+    const response = await teamformationService.updadteStatusService(payload,schemaName);
+    return responseToolkit.sendResponse(response, res);
+  }
+
 module.exports = [
   {
     method: httpProtocols.POST,
@@ -127,6 +134,15 @@ module.exports = [
      auth:false
     },
     handler:getGroupInfo
+  },
+  {
+    method:httpProtocols.PUT,
+    path:teamformationEndpoints.UPDATE_STATUS,
+    options:{
+      auth:false
+    },
+    handler:updateStatus
   }
+  
   
 ];

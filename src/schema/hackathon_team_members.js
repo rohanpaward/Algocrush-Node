@@ -49,6 +49,11 @@ const hackathon_team_members = sequelize.define(
             allowNull: false,
             defaultValue: DataTypes.NOW,
         },
+        current_status:{
+            type: DataTypes.STRING,
+            // allowNull: false,
+            // defaultValue: DataTypes.NOW,
+        }
     },
     {
         tableName: 'hackathon_team_members',
@@ -92,6 +97,7 @@ hackathon_team_members.joiValidate = (obj) => {
             .valid('creator', 'member')
             .default('member'),
         joined_at: Joi.date().optional(),
+        current_status: Joi.string().default('Available')
     };
 
     return Joi.validate(obj, schema);

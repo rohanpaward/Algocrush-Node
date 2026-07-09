@@ -508,6 +508,7 @@ const getGroupInfoService = async (payload, schemaName) => {
                 "hackathon_name",
                 "status",
                 "creator_id",
+                
             ],
         });
 
@@ -557,6 +558,7 @@ const getGroupInfoService = async (payload, schemaName) => {
                 member.role == null
                     ? "Creator"
                     : member.role.role_name,
+            current_status: member.current_status,
             joined_at: member.joined_at,
         }));
 
@@ -579,6 +581,55 @@ const getGroupInfoService = async (payload, schemaName) => {
     }
 };
 
+const updadteStatusService = async (payload, schemaName) => {
+    const { userId, status, postId } = payload;
+
+    try {
+
+        // Check if the user belongs to this team
+        const member = await hackathon_team_members.schema(schemaName).findOne({
+            where: {
+                post_id: postId,
+                user_id: userId,
+            },
+        });
+
+        if (!member) {
+            return formatResponse(
+                "Team member not found.",
+                404
+            );
+        }
+
+        // Update status
+        await hackathon_team_members.schema(schemaName).update(
+            {
+                current_status: status,
+            },
+            {
+                where: {
+                    post_id: postId,
+                    user_id: userId,
+                },
+            }
+        );
+
+        return formatResponse(
+            "Status updated successfully.",
+            200
+        );
+
+    } catch (e) {
+        console.log(e);
+        logger.error(e);
+
+        return formatResponse(
+            "Internal Server Error",
+            500
+        );
+    }
+};
+
 
 module.exports = {
     createHackathonRequestService,
@@ -588,5 +639,6 @@ module.exports = {
     rejectRequestService,
     getTeamsService,
     getTeamMessagesService,
-    getGroupInfoService
+    getGroupInfoService,
+    updadteStatusService
 }

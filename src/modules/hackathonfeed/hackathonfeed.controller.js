@@ -27,7 +27,7 @@ module.exports = [
     method: httpProtocols.POST,
     path: hackathonfeedEndpoints.CREATE_POST,
     options: {
-        auth:false
+        auth:"jwt"
     },
     handler: createHackathonPostHandler,
     
@@ -36,7 +36,7 @@ module.exports = [
     method:httpProtocols.GET,
     path: hackathonfeedEndpoints.HACKATHON_FEED,
     options:{
-        auth:false
+        auth:"jwt"
     },
     handler: hackathonFeedHandler
   }

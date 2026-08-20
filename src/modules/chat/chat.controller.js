@@ -26,7 +26,7 @@ module.exports = [
     method: httpProtocols.GET,
     path: chatEndpoints.GET_ALL_CHATS,
     options: {
-        auth:false
+        auth:"jwt"
     },
     handler: fetchAllChatsHandler,    
   },

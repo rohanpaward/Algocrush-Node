@@ -40,10 +40,9 @@ const fetchRolesHandler = async (req, res) => {
       const payload = req.payload;
       const { schemaName } = req.app;
   
-      // ✅ Get token from Authorization header
-      const authHeader = req.headers.authorization;
-      const token = authHeader && authHeader.split(" ")[1];
-  
+      // ✅ Get token from cookies
+      const token = req.state.accessToken;
+
       if (!token) {
         return res.response({ message: "Unauthorized" }).code(401);
       }
@@ -81,7 +80,7 @@ module.exports = [
     path: onboardingEndpoints.GET_ROLES,
 //    options: OnboardingOptions.fetchRolesOptions,
     options: {
-        auth:false
+        auth:"jwt"
     },
     handler: fetchRolesHandler,
     
@@ -91,7 +90,7 @@ module.exports = [
     path: onboardingEndpoints.GET_DOMAINS,
 //    options: OnboardingOptions.fetchRolesOptions,
     options: {
-        auth:false
+        auth:"jwt"
     },
     handler: fetchDomainHandler,
     
@@ -101,7 +100,7 @@ module.exports = [
     path: onboardingEndpoints.GET_SKILLS_BY_DOMAIN,
 //    options: OnboardingOptions.fetchRolesOptions,
     options: {
-        auth:false
+        auth:"jwt"
     },
     handler: fetchSkillsByDomainHandler,
     
@@ -111,7 +110,7 @@ module.exports = [
     path: onboardingEndpoints.GET_LOOKING_FOR,
 //    options: OnboardingOptions.fetchRolesOptions,
     options: {
-        auth:false
+        auth:"jwt"
     },
     handler: fetchLookingforHandler,
     
@@ -120,7 +119,7 @@ module.exports = [
     method:httpProtocols.POST,
     path:onboardingEndpoints.ONBOARD_USER,
     options: {
-      auth:false
+      auth:"jwt"
     },
     handler:registerUser,
   },
@@ -128,7 +127,7 @@ module.exports = [
     method:httpProtocols.GET,
     path:onboardingEndpoints.GET_BUILD_TYPES,
     options:{
-      auth:false
+      auth:"jwt"
     },
     handler:fetchbuildtypes
   },
@@ -136,7 +135,7 @@ module.exports = [
     method:httpProtocols.PUT,
     path:onboardingEndpoints.UPDATE_USER,
     options:{
-      auth:false
+      auth:"jwt"
     },
     handler:updateUser
   }

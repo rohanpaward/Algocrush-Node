@@ -3,6 +3,7 @@ const Hapi = require('@hapi/hapi');
 const { sequelize, testConnection } = require('./db');
 const routes = require('./src/router');
 const { initSocket, initChatSocket, initSocketHandlers } = require('./src/sockets');
+const registerAuthPlugin = require("./src/plugin/auth.plugin")
 
 const init = async () => {
   try {
@@ -11,7 +12,11 @@ const init = async () => {
       host: '0.0.0.0',
       routes: {
         cors: {
-          origin: ['*'],
+          origin:[
+            "http://localhost:3000",
+            "http://localhost:5173",
+            "https://algocrush-frontend.onrender.com"
+            ],
           credentials: true,
         },
       },
@@ -21,14 +26,15 @@ const init = async () => {
 
     //  1. REGISTER COOKIE PLUGIN
     await hapiServer.register(require('@hapi/cookie'));
+    await registerAuthPlugin(hapiServer);
 
     // ✅ 2. DEFINE SESSION STRATEGY
     hapiServer.auth.strategy('session', 'cookie', {
       cookie: {
         name: 'oauth-session',
         password: process.env.COOKIE_PASSWORD,
-        isSecure: true, // ⚠️ true in production (HTTPS)
-        isSameSite: "None", // ✅ Change from "Lax" to "None"
+        isSecure: process.env.NODE_ENV === "production", // ⚠️ true in production (HTTPS)
+        isSameSite: "Lax", // ✅ Change from "Lax" to "None"
       },
       redirectTo: false,
     });

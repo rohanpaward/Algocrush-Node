@@ -83,7 +83,7 @@ module.exports = [
     method:httpProtocols.POST,
     path:teamformationEndpoints.HACKTHON_REQUEST,
     options:{
-        auth:false
+        auth:"jwt"
     },
     handler:getHackathonRequestHandler
   },
@@ -99,7 +99,7 @@ module.exports = [
     method:httpProtocols.POST,
     path:teamformationEndpoints.HACKATHON_ACCEPT_REQUEST,
     options:{
-        auth:false
+        auth:"jwt"
     },
     handler:acceptRequest
   },
@@ -107,7 +107,7 @@ module.exports = [
     method:httpProtocols.POST,
     path:teamformationEndpoints.HACKATHON_REJECT_REQUEST,
     options:{
-        auth:false
+        auth:"jwt"
     },
     handler:rejectRequest
   },
@@ -115,7 +115,7 @@ module.exports = [
     method:httpProtocols.POST,
     path:teamformationEndpoints.GET_HACKATHON_TEAMS,
     options:{
-        auth:false
+        auth:"jwt"
     },
     handler:getTeams
   },
@@ -123,7 +123,7 @@ module.exports = [
     method:httpProtocols.POST,
     path:teamformationEndpoints.GET_TEAM_MESSAGES,
     options:{
-      auth:false
+      auth:"jwt"
     },
     handler:getTeamMessages
   },
@@ -131,7 +131,7 @@ module.exports = [
     method:httpProtocols.GET,
     path:teamformationEndpoints.GET_GROUP_INFO,
     options:{
-     auth:false
+     auth:"jwt"
     },
     handler:getGroupInfo
   },
@@ -139,7 +139,7 @@ module.exports = [
     method:httpProtocols.PUT,
     path:teamformationEndpoints.UPDATE_STATUS,
     options:{
-      auth:false
+      auth:"jwt"
     },
     handler:updateStatus
   }

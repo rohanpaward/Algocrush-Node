@@ -37,9 +37,6 @@ const getMeController = async (req, h) => {
   try {
     const { schemaName } = req.app;
 
-    // ✅ Read from Authorization header instead of cookie
-    const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(" ")[1];
 
     const serviceResponse = await getMeHandler(token, schemaName);
 
@@ -71,7 +68,7 @@ module.exports = [
   {
     method: httpProtocols.GET,
     path: authEndpoints.AUTH_ME,
-    options: { auth: false }, // IMPORTANT
+    options: { auth: 'jwt' }, // IMPORTANT
     handler: getMeController,
   }
 ];

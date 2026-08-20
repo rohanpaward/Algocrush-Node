@@ -37,8 +37,19 @@ const googleCallbackHandler = async (req, h) => {
 
     const session = req.state["oauth-session"];
 
-    if (!session || state !== session.state) {
-      return h.response("Invalid state").code(400);
+    console.log("State from Google:", state);
+    console.log("Session:", session);
+
+    if (!session) {
+      console.log("❌ oauth-session cookie missing");
+      return h.response("Invalid state - no session").code(400);
+    }
+
+    console.log("State in cookie:", session.state);
+
+    if (state !== session.state) {
+      console.log("❌ State mismatch");
+      return h.response("Invalid state - mismatch").code(400);
     }
 
     //  Exchange code
@@ -72,15 +83,15 @@ const googleCallbackHandler = async (req, h) => {
     });
     
     let user;
-    
+
     if (authProvider && authProvider.user_id) {
       // valid existing user
       user = await Users.findByPk(authProvider.user_id);
     }
-    
+
     const status = await statuses.findOne({
-      where:{
-        name:"active"
+      where: {
+        name: "active"
       }
     })
 
@@ -93,7 +104,7 @@ const googleCallbackHandler = async (req, h) => {
         profile_completed: false,
         status_id: status.id,
       });
-    
+
       if (authProvider) {
         // FIX existing row
         await authProvider.update({
@@ -121,23 +132,36 @@ const googleCallbackHandler = async (req, h) => {
       { expiresIn: "1h" }
     );
 
-    const frontendurl = process.env.FRONTEND_URL
+    const frontendurl = process.env.FRONTEND_URLs
 
-    return h
-      // .redirect("http://localhost:5173/oauth-success?token")
-      // .redirect("https://algocrush-frontend.onrender.com/oauth-success")
-      .redirect(`${frontendurl}/oauth-success?token=${token}`)
-      // .state("token", token, {
-      //   isHttpOnly: true,
-      //   isSecure: true,
-      //   isSameSite: "None",
-      //   path: "/",
-      // });
+    h.state("accessToken", token, {
+      isHttpOnly: true,
+      isSecure: process.env.NODE_ENV === "production",
+      isSameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      path: "/",
+      ttl: 60 * 60 * 1000 // 1 hour
+    });
+
+    // Clear temporary OAuth session
+    console.log("Clearing oauth-session");
+    h.unstate("oauth-session", {
+      path: "/api/v1/algocrush/auth",
+    });    
+    return h.redirect(`${frontendurl}/oauth-success`);
+    // .redirect("http://localhost:5173/oauth-success?token")
+    // .redirect("https://algocrush-frontend.onrender.com/oauth-success")
+    // .redirect(`${frontendurl}/oauth-success?token=${token}`)
+    // .state("token", token, {
+    //   isHttpOnly: true,
+    //   isSecure: true,
+    //   isSameSite: "None",
+    //   path: "/",
+    // });
 
   } catch (err) {
     console.error("OAuth Error:", err);
     return h.response("OAuth failed").code(500);
-  } 
+  }
 };
 
 // GET ME

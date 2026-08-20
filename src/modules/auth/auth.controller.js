@@ -37,6 +37,14 @@ const getMeController = async (req, h) => {
   try {
     const { schemaName } = req.app;
 
+    // ✅ Read from cookie
+    const token = req.state.accessToken
+
+    if (!token) {
+      return h.response({
+        message: "Unauthorized"
+      }).code(401);
+    }
 
     const serviceResponse = await getMeHandler(token, schemaName);
 

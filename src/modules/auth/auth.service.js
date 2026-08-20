@@ -132,7 +132,7 @@ const googleCallbackHandler = async (req, h) => {
       { expiresIn: "1h" }
     );
 
-    const frontendurl = process.env.FRONTEND_URLs
+    const frontendurl = process.env.FRONTEND_URL
 
     h.state("accessToken", token, {
       isHttpOnly: true,

@@ -140,7 +140,7 @@ const googleCallbackHandler = async (req, h) => {
     h.state("accessToken", token, {
       isHttpOnly: true,
       isSecure: process.env.NODE_ENV === "production",
-      isSecure: true,
+      // isSecure: true,
       isSameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       // isSameSite: "None",
       path: "/",

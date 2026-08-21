@@ -142,7 +142,7 @@ const googleCallbackHandler = async (req, h) => {
       isSecure: process.env.NODE_ENV === "production",
       // isSecure: true,
       // isSameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-      isSameSite: "None",
+      isSameSite: "Lax",
       path: "/",
       ttl: 60 * 60 * 1000 // 1 hour
     });

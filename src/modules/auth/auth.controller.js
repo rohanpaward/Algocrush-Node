@@ -37,7 +37,7 @@ const getMeController = async (req, h) => {
   try {
     console.log("getMeController hit now");
     const { schemaName } = req.app;
- 
+    console.log("req.state.accessToken in getMeController:", req.state.accessToken);
     // ✅ Read from cookie
     const token = req.state.accessToken
 
@@ -77,7 +77,7 @@ module.exports = [
   {
     method: httpProtocols.GET,
     path: authEndpoints.AUTH_ME,
-    options: { auth: false }, // IMPORTANT
+    options: { auth: 'jwt' }, // IMPORTANT
     handler: getMeController,
   }
 ];

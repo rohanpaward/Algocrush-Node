@@ -45,7 +45,7 @@ const getMeController = async (req, h) => {
         message: "Unauthorized"
       }).code(401);
     }
-
+    console.log("req.state.accessToken:", req.state.accessToken);
     const serviceResponse = await getMeHandler(token, schemaName);
 
     return h.response(serviceResponse).code(200);

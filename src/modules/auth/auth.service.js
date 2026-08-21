@@ -145,6 +145,9 @@ const googleCallbackHandler = async (req, h) => {
       ttl: 60 * 60 * 1000 // 1 hour
     });
 
+    console.log("Access token cookie set");
+   console.log("Redirecting to:", `${frontendurl}/oauth-success`);
+
     // Clear temporary OAuth session
     console.log("Clearing oauth-session");
     h.unstate("oauth-session", {

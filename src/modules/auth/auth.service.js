@@ -134,13 +134,15 @@ const googleCallbackHandler = async (req, h) => {
     );
 
     const frontendurl = process.env.FRONTEND_URL
+    console.log("process.env.NODE_ENV:", process.env.NODE_ENV);
+    console.log("process.env.NODE_ENV === 'production':", process.env.NODE_ENV === "production");
 
     h.state("accessToken", token, {
       isHttpOnly: true,
-      // isSecure: process.env.NODE_ENV === "production",
+      isSecure: process.env.NODE_ENV === "production",
       isSecure: true,
-      // isSameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-      isSameSite: "None",
+      isSameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      // isSameSite: "None",
       path: "/",
       ttl: 60 * 60 * 1000 // 1 hour
     });

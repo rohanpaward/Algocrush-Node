@@ -77,7 +77,7 @@ module.exports = [
   {
     method: httpProtocols.GET,
     path: authEndpoints.AUTH_ME,
-    options: { auth: 'jwt' }, // IMPORTANT
+    options: { auth: false }, // IMPORTANT
     handler: getMeController,
   }
 ];

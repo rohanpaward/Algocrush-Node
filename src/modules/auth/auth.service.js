@@ -33,6 +33,7 @@ const startGoogleOAuth = async (req, h) => {
 // CALLBACK
 const googleCallbackHandler = async (req, h) => {
   try {
+    console.log("Google Callback Handler hit now");
     const { code, state } = req.query;
 
     const session = req.state["oauth-session"];
@@ -136,8 +137,10 @@ const googleCallbackHandler = async (req, h) => {
 
     h.state("accessToken", token, {
       isHttpOnly: true,
-      isSecure: process.env.NODE_ENV === "production",
-      isSameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      // isSecure: process.env.NODE_ENV === "production",
+      isSecure: true,
+      // isSameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      isSameSite: "None",
       path: "/",
       ttl: 60 * 60 * 1000 // 1 hour
     });

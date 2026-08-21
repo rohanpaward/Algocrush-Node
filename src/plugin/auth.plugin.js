@@ -10,6 +10,8 @@ const registerAuthPlugin = async (server) => {
             authenticate: async (request, h) => {
                
                 console.log("🔥 JWT Authentication Started");
+                console.log("request.state.accessToken:", request.state.accessToken);
+                console.log("request.state:", request.state);
                 const token = request.state.accessToken;
             
                 if (!token) {

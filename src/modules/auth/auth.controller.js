@@ -35,8 +35,9 @@ const googleCallbackController = async (req, res) => {
 
 const getMeController = async (req, h) => {
   try {
+    console.log("getMeController hit now");
     const { schemaName } = req.app;
-
+ 
     // ✅ Read from cookie
     const token = req.state.accessToken
 
